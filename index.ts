@@ -27,6 +27,7 @@ class Relogio {
     }
 }
 
+type IEvent = PointerEvent | KeyboardEvent
 
 
 
@@ -40,9 +41,55 @@ class Calculator {
     constructor() {}
 
     initialize() {
+        
+        document.addEventListener('pointerdown', (e: PointerEvent) => {
+            this.handleEvent(e)
+        })
 
         document.addEventListener('keydown', (e: KeyboardEvent)=> {
-           
+            this.handleEvent(e)
+        })
+
+        if(this._date && this._hour) {
+            const relogio = new Relogio(this._date, this._hour);
+            relogio.initUpdate();
+        }
+
+    }
+
+ 
+
+    handleEvent(e: IEvent) {
+        if(e instanceof PointerEvent && e.target instanceof HTMLElement) {
+            const text = e.target.innerText
+            switch(text) {
+                case 'Escape':
+                    break;
+                case '+' :
+                case '-':
+                case '/':
+                case '*': 
+                case '=':
+                    this.addOperation(text);
+                    break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    this.addValue(text);
+                    break;
+                case 'c':
+                case 'a': 
+                    this.clearValues();
+                    break;
+            }
+        } else if(e instanceof KeyboardEvent) {
             switch(e.key) {
                 case 'Escape':
                     break;
@@ -70,16 +117,10 @@ class Calculator {
                     this.clearValues();
                     break;
             }
-        })
-
-        if(this._date && this._hour) {
-            const relogio = new Relogio(this._date, this._hour);
-            relogio.initUpdate();
         }
 
-    }
-
-
+        }
+    
 
     //falta melhorar
     clearValues() {
@@ -100,6 +141,8 @@ class Calculator {
             this._values.innerText += keyValue;
         } 
     }
+
+
   
 
 

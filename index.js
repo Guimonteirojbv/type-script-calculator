@@ -28,8 +28,21 @@ var Calculator = /** @class */ (function () {
     }
     Calculator.prototype.initialize = function () {
         var _this = this;
+        document.addEventListener('pointerdown', function (e) {
+            _this.handleEvent(e);
+        });
         document.addEventListener('keydown', function (e) {
-            switch (e.key) {
+            _this.handleEvent(e);
+        });
+        if (this._date && this._hour) {
+            var relogio = new Relogio(this._date, this._hour);
+            relogio.initUpdate();
+        }
+    };
+    Calculator.prototype.handleEvent = function (e) {
+        if (e instanceof PointerEvent && e.target instanceof HTMLElement) {
+            var text = e.target.innerText;
+            switch (text) {
                 case 'Escape':
                     break;
                 case '+':
@@ -37,7 +50,7 @@ var Calculator = /** @class */ (function () {
                 case '/':
                 case '*':
                 case '=':
-                    _this.addOperation(e.key);
+                    this.addOperation(text);
                     break;
                 case '0':
                 case '1':
@@ -49,17 +62,42 @@ var Calculator = /** @class */ (function () {
                 case '7':
                 case '8':
                 case '9':
-                    _this.addValue(e.key);
+                    this.addValue(text);
                     break;
                 case 'c':
                 case 'a':
-                    _this.clearValues();
+                    this.clearValues();
                     break;
             }
-        });
-        if (this._date && this._hour) {
-            var relogio = new Relogio(this._date, this._hour);
-            relogio.initUpdate();
+        }
+        else if (e instanceof KeyboardEvent) {
+            switch (e.key) {
+                case 'Escape':
+                    break;
+                case '+':
+                case '-':
+                case '/':
+                case '*':
+                case '=':
+                    this.addOperation(e.key);
+                    break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    this.addValue(e.key);
+                    break;
+                case 'c':
+                case 'a':
+                    this.clearValues();
+                    break;
+            }
         }
     };
     //falta melhorar
