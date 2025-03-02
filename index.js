@@ -25,6 +25,10 @@ var Calculator = /** @class */ (function () {
         this._date = document.querySelector('#date');
         this._hour = document.querySelector("#hour");
         this._values = document.querySelector('.account');
+        this._useAudio = true;
+        this._buttons = document.querySelectorAll('.wrapper-buttons button');
+        this._audio = new Audio('./assets/assets_click.mp3');
+        this._operations = ['+', '-', '/', '*'];
     }
     Calculator.prototype.initialize = function () {
         var _this = this;
@@ -40,65 +44,47 @@ var Calculator = /** @class */ (function () {
         }
     };
     Calculator.prototype.handleEvent = function (e) {
+        var input = this.getInputValue(e);
+        if (!input)
+            return;
+        this.processInput(input);
+    };
+    Calculator.prototype.getInputValue = function (e) {
         if (e instanceof PointerEvent && e.target instanceof HTMLElement) {
-            var text = e.target.innerText;
-            switch (text) {
-                case 'Escape':
-                    break;
-                case '+':
-                case '-':
-                case '/':
-                case '*':
-                case '=':
-                    this.addOperation(text);
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    this.addValue(text);
-                    break;
-                case 'c':
-                case 'a':
-                    this.clearValues();
-                    break;
-            }
+            return e.target.innerText.trim();
         }
-        else if (e instanceof KeyboardEvent) {
-            switch (e.key) {
-                case 'Escape':
-                    break;
-                case '+':
-                case '-':
-                case '/':
-                case '*':
-                case '=':
-                    this.addOperation(e.key);
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    this.addValue(e.key);
-                    break;
-                case 'c':
-                case 'a':
-                    this.clearValues();
-                    break;
-            }
+        if (e instanceof KeyboardEvent) {
+            return e.key;
         }
+        return null;
+    };
+    Calculator.prototype.processInput = function (input) {
+        if (input === 'Escape')
+            this.clearValues();
+        if (this._operations.includes(input)) {
+            this.addOperation(input);
+        }
+        if (input === '=') {
+            this.calculateResult();
+        }
+        if ((/[0-9]/.test(input))) {
+            this.addValue(input);
+            return;
+        }
+        if (input.toLocaleLowerCase() === 'c' || input.toLocaleLowerCase() === 'ac') {
+            this.clearValues();
+        }
+    };
+    Calculator.prototype.toogleAudio = function () {
+        var _this = this;
+        return this._useAudio ? this._buttons.forEach(function (button) {
+            button.addEventListener('pointerdown', function (e) {
+                _this._audio.play();
+            });
+            button.addEventListener('keydown', function (e) {
+                _this._audio.play();
+            });
+        }) : null;
     };
     //falta melhorar
     Calculator.prototype.clearValues = function () {
@@ -119,7 +105,16 @@ var Calculator = /** @class */ (function () {
             this._values.innerText += keyValue;
         }
     };
+    Calculator.prototype.calculateResult = function () {
+        var result = '0';
+        if (this._values && this._values instanceof HTMLElement) {
+            console.log('teste');
+            var expression = this._values.innerText;
+            result = eval(expression);
+            this._values.innerText = result;
+        }
+    };
     return Calculator;
 }());
 var calc = new Calculator();
-console.log(calc.initialize());
+calc.initialize();

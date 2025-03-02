@@ -27,14 +27,20 @@ class Relogio {
     }
 }
 
-type IEvent = PointerEvent | KeyboardEvent
 
 
+type IEvent = PointerEvent | KeyboardEvent;
 
 class Calculator {
     private _date = document.querySelector('#date');
     private _hour = document.querySelector("#hour");
     private _values = document.querySelector('.account');
+
+    private _useAudio = true;
+    private _buttons = document.querySelectorAll('.wrapper-buttons button');
+    private _audio = new Audio('./assets/assets_click.mp3');
+
+    private _operations = ['+', '-', '/', '*']
 
 
 
@@ -60,95 +66,93 @@ class Calculator {
  
 
     handleEvent(e: IEvent) {
-        if(e instanceof PointerEvent && e.target instanceof HTMLElement) {
-            const text = e.target.innerText
-            switch(text) {
-                case 'Escape':
-                    break;
-                case '+' :
-                case '-':
-                case '/':
-                case '*': 
-                case '=':
-                    this.addOperation(text);
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    this.addValue(text);
-                    break;
-                case 'c':
-                case 'a': 
-                    this.clearValues();
-                    break;
-            }
-        } else if(e instanceof KeyboardEvent) {
-            switch(e.key) {
-                case 'Escape':
-                    break;
-                case '+' :
-                case '-':
-                case '/':
-                case '*': 
-                case '=':
-                    this.addOperation(e.key);
-                    break;
-                case '0':
-                case '1':
-                case '2':
-                case '3':
-                case '4':
-                case '5':
-                case '6':
-                case '7':
-                case '8':
-                case '9':
-                    this.addValue(e.key);
-                    break;
-                case 'c':
-                case 'a': 
-                    this.clearValues();
-                    break;
-            }
-        }
+        const input = this.getInputValue(e);
+        
+        if(!input) return;
 
-        }
+        this.processInput(input);
+    }
     
+    private getInputValue(e: IEvent): string | null {
+        if(e instanceof PointerEvent && e.target instanceof HTMLElement) {
+            return e.target.innerText.trim();
+        }
+        if(e instanceof KeyboardEvent) {
+            return e.key;
+        }
 
+        return null;
+    }
+
+    private processInput(input: string) {
+        if(input === 'Escape') this.clearValues();
+        
+        if(this._operations.includes(input)) {
+            this.addOperation(input);
+        }
+
+        if(input === '=') {
+            this.calculateResult();
+        }
+
+        if((/[0-9]/.test(input))) {
+            this.addValue(input);
+            return
+        }
+
+        if(input.toLocaleLowerCase() === 'c' || input.toLocaleLowerCase() === 'ac') {
+            this.clearValues();
+        }
+    }
+
+    private toogleAudio() {
+        return this._useAudio ? this._buttons.forEach((button) => {
+            button.addEventListener('pointerdown', (e: Event) => {
+                this._audio.play();
+            })
+            button.addEventListener('keydown', (e: Event) => {
+                this._audio.play();
+            })
+        }) : null;
+    }
+        
     //falta melhorar
-    clearValues() {
+    private clearValues() {
         if(this._values && this._values instanceof HTMLElement) {
             this._values.innerText = '0';
         } 
     }
 
-    addValue(keyValue: string) {
+    private addValue(keyValue: string) {
         if(this._values && this._values instanceof HTMLElement) {
             if(this._values.innerText === '0') this._values.innerText = keyValue;
             else this._values.innerText += keyValue;
         } 
     }
 
-    addOperation(keyValue: string) {
-        if(this._values && this._values instanceof HTMLElement) {
+    private addOperation(keyValue: string) {
+        if(this._values && this._values instanceof HTMLElement) {     
             this._values.innerText += keyValue;
         } 
     }
 
+    private calculateResult() {
+        let result = '0'
+        
+        if(this._values && this._values instanceof HTMLElement) {
+            console.log('teste')
+            const expression = this._values.innerText 
+            result = eval(expression);
 
-  
+            this._values.innerText = result;
+        }
+        
 
 
+    }
   
 }
 
 const calc = new Calculator();
 
-console.log(calc.initialize())
+calc.initialize();
