@@ -36,9 +36,7 @@ class Calculator {
     private _hour = document.querySelector("#hour");
     private _values = document.querySelector('.account');
 
-    private _useAudio = true;
-    private _buttons = document.querySelectorAll('.wrapper-buttons button');
-    private _audio = new Audio('./assets/assets_click.mp3');
+ 
 
     private _operations = ['+', '-', '/', '*']
 
@@ -105,18 +103,9 @@ class Calculator {
         }
     }
 
-    private toogleAudio() {
-        return this._useAudio ? this._buttons.forEach((button) => {
-            button.addEventListener('pointerdown', (e: Event) => {
-                this._audio.play();
-            })
-            button.addEventListener('keydown', (e: Event) => {
-                this._audio.play();
-            })
-        }) : null;
-    }
+  
         
-    //falta melhorar
+    
     private clearValues() {
         if(this._values && this._values instanceof HTMLElement) {
             this._values.innerText = '0';
@@ -140,7 +129,7 @@ class Calculator {
         let result = '0'
         
         if(this._values && this._values instanceof HTMLElement) {
-            console.log('teste')
+            
             const expression = this._values.innerText 
             result = eval(expression);
 

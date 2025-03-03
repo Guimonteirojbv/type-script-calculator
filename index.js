@@ -25,9 +25,6 @@ var Calculator = /** @class */ (function () {
         this._date = document.querySelector('#date');
         this._hour = document.querySelector("#hour");
         this._values = document.querySelector('.account');
-        this._useAudio = true;
-        this._buttons = document.querySelectorAll('.wrapper-buttons button');
-        this._audio = new Audio('./assets/assets_click.mp3');
         this._operations = ['+', '-', '/', '*'];
     }
     Calculator.prototype.initialize = function () {
@@ -75,18 +72,6 @@ var Calculator = /** @class */ (function () {
             this.clearValues();
         }
     };
-    Calculator.prototype.toogleAudio = function () {
-        var _this = this;
-        return this._useAudio ? this._buttons.forEach(function (button) {
-            button.addEventListener('pointerdown', function (e) {
-                _this._audio.play();
-            });
-            button.addEventListener('keydown', function (e) {
-                _this._audio.play();
-            });
-        }) : null;
-    };
-    //falta melhorar
     Calculator.prototype.clearValues = function () {
         if (this._values && this._values instanceof HTMLElement) {
             this._values.innerText = '0';
@@ -108,7 +93,6 @@ var Calculator = /** @class */ (function () {
     Calculator.prototype.calculateResult = function () {
         var result = '0';
         if (this._values && this._values instanceof HTMLElement) {
-            console.log('teste');
             var expression = this._values.innerText;
             result = eval(expression);
             this._values.innerText = result;
